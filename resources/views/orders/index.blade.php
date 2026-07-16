@@ -259,10 +259,35 @@
             box-shadow:0 10px 20px rgba(16,185,129,0.35);
         }
 
+        /* STATUS BADGES */
+
+        .badge-pending    { background:linear-gradient(135deg,#f59e0b,#fbbf24); }
+        .badge-processing { background:linear-gradient(135deg,#3b82f6,#06b6d4); }
+        .badge-completed  { background:linear-gradient(135deg,#10b981,#14b8a6); }
+        .badge-cancelled  { background:linear-gradient(135deg,#ef4444,#f97316); }
+        .status-badge {
+            display:inline-block;
+            padding:6px 14px;
+            border-radius:10px;
+            color:white;
+            font-size:12px;
+            font-weight:700;
+        }
+
         /* ACTION BUTTONS */
 
         .btn-view{
             background:linear-gradient(135deg,#10b981,#14b8a6);
+            border:none;
+            border-radius:12px;
+            padding:9px 16px;
+            font-size:13px;
+            font-weight:600;
+            color:white !important;
+        }
+
+        .btn-edit{
+            background:linear-gradient(135deg,#f59e0b,#fbbf24);
             border:none;
             border-radius:12px;
             padding:9px 16px;
@@ -282,6 +307,7 @@
         }
 
         .btn-view:hover,
+        .btn-edit:hover,
         .btn-delete:hover{
             transform:translateY(-2px);
         }
@@ -376,13 +402,14 @@
 
             </div>
 
-            <a href="{{ route('orders.create') }}"
-               class="btn-create">
-
-                <span>➕</span>
-                <span>Create New Order</span>
-
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('prefix.dashboard') }}" class="btn-create" style="background:linear-gradient(135deg,#f59e0b,#06b6d4)">
+                    <span>⚙️</span><span>Prefix Dashboard</span>
+                </a>
+                <a href="{{ route('orders.create') }}" class="btn-create">
+                    <span>➕</span><span>Create New Order</span>
+                </a>
+            </div>
 
         </div>
 
@@ -483,7 +510,8 @@
                             <th>ID</th>
                             <th>Order Name</th>
                             <th>Prefixed ID</th>
-                            <th width="220">Actions</th>
+                            <th>Status</th>
+                            <th width="260">Actions</th>
 
                         </tr>
 
@@ -518,30 +546,29 @@
                             </td>
 
                             <td>
+                                <span class="status-badge {{ $order->getStatusBadgeClass() }}">
+                                    {{ $order->getStatusEmoji() }} {{ ucfirst($order->status) }}
+                                </span>
+                            </td>
+
+                            <td>
 
                                 <div class="d-flex gap-2">
 
                                     <a href="{{ route('orders.show', $order->prefixed_id) }}"
-                                       class="btn btn-view btn-sm">
+                                       class="btn btn-view btn-sm">👁 View</a>
 
-                                        👁 View
-
-                                    </a>
+                                    <a href="{{ route('orders.edit', $order->prefixed_id) }}"
+                                       class="btn btn-edit btn-sm">✏️ Edit</a>
 
                                     <form action="{{ route('orders.destroy', $order->prefixed_id) }}"
                                           method="POST">
-
                                         @csrf
                                         @method('DELETE')
-
-                                        <button
-                                            class="btn btn-delete btn-sm"
+                                        <button class="btn btn-delete btn-sm"
                                             onclick="return confirm('Delete this order?')">
-
                                             🗑 Delete
-
                                         </button>
-
                                     </form>
 
                                 </div>
