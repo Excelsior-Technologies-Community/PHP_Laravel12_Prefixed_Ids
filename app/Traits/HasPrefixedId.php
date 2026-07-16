@@ -6,24 +6,21 @@ use App\Services\PrefixedIdManager;
 
 trait HasPrefixedId
 {
-    protected static function bootHasPrefixedId()
+    protected static function bootHasPrefixedId(): void
     {
         static::creating(function ($model) {
             $manager = app(PrefixedIdManager::class);
-
-            // Get prefix for this model from config
-            $prefix = array_search(static::class, config('prefixed_ids.models'));
-
+            $prefix  = $manager->getPrefixForModel(static::class);
             $model->prefixed_id = $manager->generate($prefix);
         });
     }
 
-    public function scopeFindByPrefixedId($query, $id)
+    public function scopeFindByPrefixedId($query, string $id)
     {
         return $query->where('prefixed_id', $id)->first();
     }
 
-    public function getRouteKeyName()
+    public function getRouteKeyName(): string
     {
         return config('prefixed_ids.prefixed_id_attribute_name');
     }

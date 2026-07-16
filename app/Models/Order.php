@@ -9,14 +9,32 @@ class Order extends Model
 {
     use HasPrefixedId;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'status', 'notes'];
 
-
-    /**
-     * Use prefixed_id for route model binding instead of id
-     */
     public function getRouteKeyName()
     {
         return 'prefixed_id';
+    }
+
+    public function getStatusBadgeClass(): string
+    {
+        return match($this->status) {
+            'pending'    => 'badge-pending',
+            'processing' => 'badge-processing',
+            'completed'  => 'badge-completed',
+            'cancelled'  => 'badge-cancelled',
+            default      => 'badge-pending',
+        };
+    }
+
+    public function getStatusEmoji(): string
+    {
+        return match($this->status) {
+            'pending'    => '⏳',
+            'processing' => '⚙️',
+            'completed'  => '✅',
+            'cancelled'  => '❌',
+            default      => '⏳',
+        };
     }
 }

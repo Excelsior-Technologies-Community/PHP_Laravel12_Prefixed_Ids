@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Order</title>
+    <title>Edit Order</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -26,15 +26,24 @@
             width: 80px; height: 80px;
             margin: auto;
             border-radius: 50%;
-            background: #e9f2ff;
+            background: #fff3cd;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 35px;
         }
         .form-control, .form-select { border-radius: 12px; font-size: 15px; border: 1px solid #dfe3e8; box-shadow: none; }
-        .form-control:focus, .form-select:focus { border-color: #0d6efd; box-shadow: 0 0 0 0.15rem rgba(13,110,253,.15); }
-        .btn-submit { height: 55px; border-radius: 12px; font-size: 17px; font-weight: 600; }
+        .form-control:focus, .form-select:focus { border-color: #ffc107; box-shadow: 0 0 0 0.15rem rgba(255,193,7,.2); }
+        .prefixed-id-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-family: monospace;
+            font-size: 15px;
+            color: #198754;
+            font-weight: 600;
+        }
         .alert { border-radius: 12px; }
     </style>
 </head>
@@ -42,17 +51,10 @@
 <div class="order-card">
 
     <div class="text-center mb-4">
-        <div class="icon-box mb-3">📦</div>
-        <h2 class="fw-700 fs-4">Create New Order</h2>
-        <p class="text-muted small">Laravel 12 Prefixed ID System</p>
+        <div class="icon-box mb-3">✏️</div>
+        <h2 class="fw-bold fs-4">Edit Order</h2>
+        <p class="text-muted small">Update order details below</p>
     </div>
-
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
 
     @if($errors->any())
         <div class="alert alert-danger">
@@ -60,13 +62,19 @@
         </div>
     @endif
 
-    <form action="{{ route('orders.store') }}" method="POST">
+    <form action="{{ route('orders.update', $order->prefixed_id) }}" method="POST">
         @csrf
+        @method('PUT')
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Prefixed ID</label>
+            <div class="prefixed-id-box">{{ $order->prefixed_id }}</div>
+        </div>
 
         <div class="mb-3">
             <label class="form-label fw-semibold">Order Name <span class="text-danger">*</span></label>
             <input type="text" name="name" class="form-control" style="height:50px"
-                   placeholder="Enter Order Name" value="{{ old('name') }}" required>
+                   value="{{ old('name', $order->name) }}" required>
             @error('name')<div class="text-danger mt-1 small">{{ $message }}</div>@enderror
         </div>
 
@@ -74,24 +82,35 @@
             <label class="form-label fw-semibold">Status</label>
             <select name="status" class="form-select" style="height:50px">
                 @foreach(['pending' => '⏳ Pending', 'processing' => '⚙️ Processing', 'completed' => '✅ Completed', 'cancelled' => '❌ Cancelled'] as $val => $label)
-                    <option value="{{ $val }}" {{ old('status', 'pending') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                    <option value="{{ $val }}" {{ old('status', $order->status) === $val ? 'selected' : '' }}>{{ $label }}</option>
                 @endforeach
             </select>
         </div>
 
         <div class="mb-4">
-            <label class="form-label fw-semibold">Notes <span class="text-muted small">(optional)</span></label>
+            <label class="form-label fw-semibold">Notes</label>
             <textarea name="notes" class="form-control" rows="3"
-                      placeholder="Add any notes about this order...">{{ old('notes') }}</textarea>
+                      placeholder="Add any notes...">{{ old('notes', $order->notes) }}</textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100 btn-submit">🚀 Create Order</button>
+        <button type="submit" class="btn btn-warning w-100 fw-bold" style="height:55px;border-radius:12px;font-size:17px">
+            💾 Update Order
+        </button>
     </form>
 
-    <div class="d-grid mt-3">
-        <a href="{{ route('orders.index') }}" class="btn btn-dark" style="height:50px;border-radius:12px;font-weight:600;line-height:2">
-            📋 View All Orders
-        </a>
+    <div class="row mt-3 g-2">
+        <div class="col-6">
+            <a href="{{ route('orders.show', $order->prefixed_id) }}"
+               class="btn btn-outline-secondary w-100 fw-semibold" style="height:48px;border-radius:12px;line-height:2">
+                👁 View Order
+            </a>
+        </div>
+        <div class="col-6">
+            <a href="{{ route('orders.index') }}"
+               class="btn btn-dark w-100 fw-semibold" style="height:48px;border-radius:12px;line-height:2">
+                📋 All Orders
+            </a>
+        </div>
     </div>
 
 </div>
